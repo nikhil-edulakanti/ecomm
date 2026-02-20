@@ -8,9 +8,11 @@ import java.util.List;
 
 public interface CategoryService {
 
-    CategoryResponseDTO getCategories();
-    String addCategory(CategoryDTO categoryDTO);
-    String updateCategory(Long id, Category category);
+    CategoryResponseDTO getCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 
-    String deleteCategory(Long id);
+    CategoryDTO addCategory(CategoryDTO categoryDTO);
+
+    CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO);
+
+    CategoryDTO deleteCategory(Long id);
 }

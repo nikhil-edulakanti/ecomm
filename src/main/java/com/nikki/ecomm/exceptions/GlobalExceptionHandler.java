@@ -1,6 +1,7 @@
 package com.nikki.ecomm.exceptions;
 
 
+import com.nikki.ecomm.payload.APIResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -28,14 +29,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFound.class)
-    public ResponseEntity<String> hanldeResourceNotFound(ResourceNotFound e) {
+    public ResponseEntity<APIResponse> hanldeResourceNotFound(ResourceNotFound e) {
         String result  = e.getMessage();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new APIResponse(result,false));
     }
 
     @ExceptionHandler(APIException.class)
-    public ResponseEntity<String> handelAPIException(APIException e) {
+    public ResponseEntity<APIResponse> handelAPIException(APIException e) {
         String result  = e.getMessage();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new APIResponse(result,false));
     }
 }

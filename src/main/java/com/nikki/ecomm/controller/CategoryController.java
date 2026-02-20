@@ -1,5 +1,6 @@
 package com.nikki.ecomm.controller;
 
+import com.nikki.ecomm.configuration.AppConstants;
 import com.nikki.ecomm.models.Category;
 import com.nikki.ecomm.payload.CategoryDTO;
 import com.nikki.ecomm.payload.CategoryResponseDTO;
@@ -20,29 +21,37 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    @GetMapping("/echo")
+    public ResponseEntity<String> displayEcho(@RequestParam(name = "in" ) String input) {
+        return ResponseEntity.ok("The input from thw URL is " + input);
+    }
+
     @GetMapping("/public/categories")
-    public ResponseEntity<CategoryResponseDTO>  getAllCategories() {
-        return ResponseEntity.status(HttpStatus.OK).body(categoryService.getCategories());
+    public ResponseEntity<CategoryResponseDTO>  getAllCategories(
+            @RequestParam(name ="pageNumber",defaultValue = AppConstants.pageNumber, required = false) Integer pageNumber,
+            @RequestParam(name ="pageSize", defaultValue = AppConstants.pageSize , required = false) Integer pageSize,
+            @RequestParam(name ="sortBy", defaultValue = AppConstants.sortBy, required = false) String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = AppConstants.sortDirection, required = false) String sortDir) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.getCategories(pageNumber, pageSize, sortBy,sortDir));
     }
 
     @PostMapping("/public/categories")
-    public ResponseEntity<String> addCategory(@Valid  @RequestBody CategoryDTO categoryDTO) {
-        String result = categoryService.addCategory(categoryDTO);
-        //System.out.println(categoryDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseEntity<CategoryDTO> addCategory(@Valid  @RequestBody CategoryDTO categoryDTO) {
+        CategoryDTO savedCategory = categoryService.addCategory(categoryDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedCategory);
     }
 
     @PutMapping("/public/categories/{categoryId}")
-    public ResponseEntity<String> updateCategory(@PathVariable("categoryId") Long categoryId, @Valid  @RequestBody Category category) {
-            String  result = categoryService.updateCategory(categoryId, category);
-            return ResponseEntity.status(HttpStatus.OK).body(result);
+    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable("categoryId") Long categoryId, @Valid  @RequestBody CategoryDTO categoryDTO) {
+            CategoryDTO updatedCategoryDTO = categoryService.updateCategory(categoryId, categoryDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedCategoryDTO);
     }
 
     @DeleteMapping("/admin/categories/{categoryID}")
-    public ResponseEntity<String> deleteCategory(@PathVariable("categoryID") Long categoryID) {
+    public ResponseEntity<CategoryDTO> deleteCategory(@PathVariable("categoryID") Long categoryID) {
 
-            String result = categoryService.deleteCategory(categoryID);
-            return ResponseEntity.status(HttpStatus.OK).body(result);
+            CategoryDTO deletedCategoryDTO = categoryService.deleteCategory(categoryID);
+            return ResponseEntity.status(HttpStatus.OK).body(deletedCategoryDTO);
 
     }
 
