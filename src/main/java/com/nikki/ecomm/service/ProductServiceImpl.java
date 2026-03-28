@@ -90,17 +90,51 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO getProductsByKeyword(String keyword) {
-        List<Product> returnedProducts = productRepository.findByProductName(keyword);
+    public ProductResponseDTO getProductsByKeyword(String keyword, Integer pageNumber,
+                                                   Integer pageSize, String sortBy, String sortDir) {
+
+        Sort sortByandOrder = sortDir.equalsIgnoreCase("asc") ?Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageDetails = PageRequest.of(pageNumber,pageSize, sortByandOrder);
+        Page<Product> returnedProducts =  productRepository.findByKeyword(keyword, pageDetails);
+
         List<ProductDTO> productDTO = new ArrayList<>();
         returnedProducts.stream().forEach(product -> {
             ProductDTO dto = modelMapper.map(product, ProductDTO.class);
             productDTO.add(dto);
         });
-
-       // return new ProductResponseDTO(productDTO);
-        return null;
+        ProductResponseDTO result  =  new ProductResponseDTO();
+        result.setProductDTOList(productDTO);
+        result.setPageNumber(returnedProducts.getNumber());
+        result.setPageSize(returnedProducts.getSize());
+        result.setTotalElements(returnedProducts.getTotalElements());
+        result.setTotalPages(returnedProducts.getTotalPages());
+        result.setLastPage(returnedProducts.isLast());
+        return  result;
     }
 
+    @Override
+    public ProductDTO deleteProduct(Long productId) {
+        Product foundProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFound("Product", "id", productId));
+        productRepository.delete(foundProduct);
+        return modelMapper.map(foundProduct, ProductDTO.class);
+
+    }
+
+    @Override
+    public ProductDTO updateProduct(Long productId, Product product) {
+        Product foundProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFound("Product", "id", productId));
+        foundProduct.setProductName(product.getProductName());
+        foundProduct.setDescription(product.getDescription());
+        foundProduct.setImage(product.getImage());
+        foundProduct.setQuantity(product.getQuantity());
+        foundProduct.setPrice(product.getPrice());
+        foundProduct.setDiscount(product.getDiscount());
+        foundProduct.setSpecialPrice(product.getSpecialPrice());
+        productRepository.save(foundProduct);
+        return modelMapper.map(foundProduct, ProductDTO.class);
+    }
 
 }

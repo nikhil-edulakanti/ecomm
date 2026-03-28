@@ -43,7 +43,24 @@ public class ProductController {
     }
 
     @GetMapping("/public/products/{keyword}")
-    public ResponseEntity<ProductResponseDTO> getProductsByKeyword(@PathVariable String keyword) {
-        return  ResponseEntity.status(HttpStatus.ACCEPTED).body(productService.getProductsByKeyword(keyword));
+    public ResponseEntity<ProductResponseDTO> getProductsByKeyword(
+            @PathVariable String keyword,
+            @RequestParam(name ="pageNumber",defaultValue = AppConstants.pageNumber, required = false) Integer pageNumber,
+            @RequestParam(name ="pageSize", defaultValue = AppConstants.pageSize , required = false) Integer pageSize,
+            @RequestParam(name ="sortBy", defaultValue = AppConstants.sortBy, required = false) String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = AppConstants.sortDirection, required = false) String sortDir)
+     {
+        return  ResponseEntity.status(HttpStatus.ACCEPTED).body(productService.getProductsByKeyword(keyword,pageNumber,
+                pageSize,sortBy,sortDir));
+    }
+
+    @DeleteMapping("/admin/products/{productId}")
+    public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId) {
+        return ResponseEntity.status(HttpStatus.OK).body(productService.deleteProduct(productId));
+    }
+
+    @PutMapping("/admin/products/{productId}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId, @RequestBody Product product) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(productService.updateProduct(productId,product));
     }
 }
